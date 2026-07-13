@@ -1,4 +1,4 @@
-# Hospital Frontend
+git commit -m "Merge remote develop, resolve README conflict"# Hospital Frontend
 
 React frontend for pulse_care hospital management system.
 

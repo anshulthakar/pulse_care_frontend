@@ -1,49 +1,32 @@
-import { FrappeProvider, useFrappeAuth, useFrappeGetDocList } from 'frappe-react-sdk'
-
-function LoginTest() {
-  const { login, currentUser, isLoading } = useFrappeAuth()
-
-  const handleLogin = async () => {
-    try {
-      await login({ username: 'Administrator', password: '123' })
-    } catch (err) {
-      console.error('Login failed:', err)
-    }
-  }
-
-  if (isLoading) return <p>Checking session...</p>
-
-  return currentUser ? (
-    <div>
-      <p>Logged in as {currentUser}</p>
-      <PatientList />
-    </div>
-  ) : (
-    <button onClick={handleLogin}>Login as Administrator</button>
-  )
-}
-
-function PatientList() {
-  const { data, error, isLoading } = useFrappeGetDocList('Patient', {
-    fields: ['name'],
-    limit: 5,
-  })
-
-  if (isLoading) return <p>Loading patients...</p>
-  if (error) return <p>Error: {error.message}</p>
-
-  return (
-    <div>
-      <h3>Patients ({data?.length ?? 0})</h3>
-      <ul>{data?.map((p) => <li key={p.name}>{p.name}</li>)}</ul>
-    </div>
-  )
-}
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { FrappeProvider } from 'frappe-react-sdk'
+import Login from './pages/Login/Login'
+import Dashboard from './pages/Dashboard/Dashboard'
+import Patients from './pages/Patients/Patients'
+import PatientForm from './pages/Patients/PatientForm'
+import AppLayout from './layouts/AppLayout'
+import ProtectedRoute from './routes/ProtectedRoute'
 
 function App() {
   return (
     <FrappeProvider url=''>
-      <LoginTest />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="patients" element={<Patients />} />
+            <Route path="patients/new" element={<PatientForm />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </FrappeProvider>
   )
 }
