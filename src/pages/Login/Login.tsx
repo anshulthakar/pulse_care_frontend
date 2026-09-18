@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useFrappeAuth } from 'frappe-react-sdk'
 import './Login.css'
 import { useNavigate } from 'react-router-dom'
@@ -18,11 +18,18 @@ function Login() {
     e.preventDefault()
     setError('')
     setLoading(true)
+
     try {
+      // Authenticate dynamically against Frappe API
       await login({ username, password })
-      navigate('/')
-    } catch (err) {
-      setError('Incorrect email or password. Please try again.')
+      navigate('/', { replace: true })
+    } catch (err: any) {
+      // Extract dynamic backend message or fall back to default
+      const message =
+        err?.message ||
+        err?.response?.data?.message ||
+        'Incorrect email or password. Please try again.'
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -31,29 +38,31 @@ function Login() {
   return (
     <div className="login-page">
       <div className="login-brand">
-      <div className="blob blob-1"></div>
-      <div className="blob blob-2"></div>
-      <div className="brand-top">
-        <div className="brand-mark">P</div>
-        <span className="brand-name">Pulse Care</span>
-      </div>
+        <div className="blob blob-1"></div>
+        <div className="blob blob-2"></div>
+        <div className="brand-top">
+          <div className="brand-mark">P</div>
+          <span className="brand-name">Pulse Care</span>
+        </div>
 
         <div className="brand-mid">
           <div className="brand-eyebrow">Staff portal</div>
-          <h1 className="brand-headline">Every patient,<br />one clear signal.</h1>
+          <h1 className="brand-headline">
+            Every patient,<br />one clear signal.
+          </h1>
           <p className="brand-sub">
             Registration, records, and billing in one place —
             built for the pace of a real hospital floor.
           </p>
           <div className="pulse-wrap">
-          <svg viewBox="0 0 400 90" width="100%" height="100%">
-            <path
-              className="pulse-line"
-              d="M0,45 L90,45 L110,20 L130,70 L150,10 L170,80 L190,45 L400,45"
-            />
-            <circle className="pulse-dot" r="4" />
-          </svg>
-        </div>
+            <svg viewBox="0 0 400 90" width="100%" height="100%">
+              <path
+                className="pulse-line"
+                d="M0,45 L90,45 L110,20 L130,70 L150,10 L170,80 L190,45 L400,45"
+              />
+              <circle className="pulse-dot" r="4" />
+            </svg>
+          </div>
         </div>
 
         <div className="brand-bottom">SECURE SESSION · ENCRYPTED</div>
@@ -73,7 +82,7 @@ function Login() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="you@hospital.com"
+              placeholder="Administrator"
               autoComplete="username"
               required
             />

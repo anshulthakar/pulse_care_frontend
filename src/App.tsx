@@ -9,10 +9,17 @@ import ProtectedRoute from './routes/ProtectedRoute'
 
 function App() {
   return (
-    <FrappeProvider url=''>
+    // Passing empty string uses relative URLs (/api/method/...) 
+    // which Vite proxies locally and Nginx handles in production.
+    <FrappeProvider
+      url=""
+      enableSocket={false}
+    >
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          
+          {/* Protected Routes wrapped in AppLayout */}
           <Route
             path="/"
             element={
