@@ -1,9 +1,19 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useFrappeAuth } from 'frappe-react-sdk'
 import './AppLayout.css'
 
 function AppLayout() {
   const { currentUser, logout } = useFrappeAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/login', { replace: true })
+    } catch (err) {
+      console.error('Logout failed:', err)
+    }
+  }
 
   return (
     <div className="app-shell">
@@ -14,20 +24,33 @@ function AppLayout() {
         </div>
 
         <nav className="sidebar-nav">
-          <NavLink to="/" end className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>
+          <NavLink 
+            to="/" 
+            end 
+            className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
+          >
             Dashboard
           </NavLink>
-          <NavLink to="/patients" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>
+          <NavLink 
+            to="/patients" 
+            end
+            className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
+          >
             Patients
           </NavLink>
-          <NavLink to="/appointments" className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}>
-            Appointments
+          <NavLink 
+            to="/patients/new" 
+            className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
+          >
+            New Patient
           </NavLink>
         </nav>
 
         <div className="sidebar-footer">
-          <div className="sidebar-user">{currentUser}</div>
-          <button className="logout-btn" onClick={() => logout()}>Log out</button>
+          <div className="sidebar-user">{currentUser || 'User'}</div>
+          <button className="logout-btn" onClick={handleLogout}>
+            Log out
+          </button>
         </div>
       </aside>
 
